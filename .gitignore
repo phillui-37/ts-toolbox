@@ -1,0 +1,78 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Runtime data
+pids/
+*.pid
+*.seed
+
+# Build output
+dist/
+build/
+out/
+
+# Dependency directories
+.pnp/
+.pnp.js
+
+# pnpm store (if you use a local store directory)
+.pnpm-store/
+.pnpm-store
+
+# Optional npm cache directory
+.npm
+
+# dotenv environment variables
+.env
+.env.*.local
+.env.local
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Test output
+.turbo/
+.cache/
+jest.cache
+
+# VSCode
+.vscode/
+
+# JetBrains
+.idea/
+
+# Editor backup files
+*~
+*.swp
+
+# TypeScript
+*.tsbuildinfo
+
+# ESLint cache
+.eslintcache
+
+# MacOS
+.DS_Store
+
+# Keep lockfiles for reproducible installs (do NOT ignore):
+# - pnpm-lock.yaml should be committed for pnpm projects
