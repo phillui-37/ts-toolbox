@@ -61,11 +61,14 @@ export interface Monoid<A> {
     concat(a: A, b: A): A;
 }
 
+import type { Kind, URIS } from './hkt.js';
+
 /**
- * Monad transformer descriptor: specifies how to lift an inner monad M into a transformer T.
+ * Monad transformer descriptor: specifies how to lift an inner monad (identified by `URI`)
+ * into transformer operations typed as `Kind<URI, A>`.
  */
-export interface MonadTransDescriptor<M> {
-    of: <A>(a: A) => M;
-    flatMap: <A, B>(m: M, fn: (a: A) => M) => M;
-    map?: <A, B>(m: M, fn: (a: A) => B) => M;
+export interface MonadTransDescriptor<URI extends URIS> {
+    of: <A>(a: A) => Kind<URI, A>;
+    flatMap: <A, B>(m: Kind<URI, A>, fn: (a: A) => Kind<URI, B>) => Kind<URI, B>;
+    map?: <A, B>(m: Kind<URI, A>, fn: (a: A) => B) => Kind<URI, B>;
 }
