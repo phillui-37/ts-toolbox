@@ -1,7 +1,7 @@
 {
-  "name": "ts-toolbox",
+  "name": "@phillui/ts-toolbox",
   "version": "1.0.0",
-  "description": "",
+  "description": "A comprehensive TypeScript functional programming library featuring monads, monad transformers, optics, and utility functions",
   "type": "module",
   "main": "./dist/ts-toolbox.umd.js",
   "module": "./dist/ts-toolbox.es.js",
@@ -9,13 +9,38 @@
   "files": [
     "dist"
   ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/ts-toolbox.es.js",
+      "require": "./dist/ts-toolbox.umd.js"
+    }
+  },
   "scripts": {
     "build": "vite build && tsc --emitDeclarationOnly",
     "test": "vitest --run"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "typescript",
+    "functional-programming",
+    "monad",
+    "monad-transformer",
+    "maybe",
+    "result",
+    "either",
+    "reader",
+    "writer",
+    "lens",
+    "prism",
+    "optics",
+    "fp",
+    "functional",
+    "type-safe",
+    "utilities"
+  ],
+  "author": "Phil Lui",
+  "license": "MIT",
   "packageManager": "pnpm@10.23.0",
   "dependencies": {
     "ts-pattern": "^5.9.0"
