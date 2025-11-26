@@ -211,7 +211,7 @@ describe('MaybeT Combinations', () => {
         it('should combine Maybe and Writer semantics', () => {
             const m = MT.of(42);
             const result = m.run(); // Writer<Maybe<number>>
-            expect((result as any).log).toBe('');
+            expect((result as any).logs).toEqual([]);
             const maybeValue = (result as any).value;
             expect(Maybe.isSome(maybeValue)).toBe(true);
             expect((maybeValue as any).value).toBe(42);
@@ -222,7 +222,7 @@ describe('MaybeT Combinations', () => {
                 .flatMap(x => MT.lift(Writer.of(x * 2, ' middle')))
                 .flatMap(x => MT.lift(Writer.of(x + 1, ' end')));
             const result = m.run();
-            expect((result as any).log).toBe('start middle end');
+            expect((result as any).logs).toEqual(['start',' middle',' end']);
             const maybeValue = (result as any).value;
             expect((maybeValue as any).value).toBe(11); // (5 * 2) + 1
         });
@@ -304,13 +304,13 @@ describe('ReaderT Combinations', () => {
         });
 
         it('should propagate errors through flatMap', () => {
-            const r = RT.from((env: string) => 
+            const r = RT.from((env: string) =>
                 env.length > 0 ? Result.ok(env.length) : Result.err('empty')
             ).flatMap(len => RT.of(len * 2));
-            
+
             expect(Result.isOk(r.run('hello'))).toBe(true);
             expect((r.run('hello') as any).value).toBe(10);
-            
+
             expect(Result.isErr(r.run(''))).toBe(true);
         });
     });
@@ -322,7 +322,7 @@ describe('ReaderT Combinations', () => {
             const r = RT.of(42);
             const result = r.run('env'); // Env -> Writer<number>
             expect((result as any).value).toBe(42);
-            expect((result as any).log).toBe('');
+            expect((result as any).logs).toEqual([]);
         });
 
         it('should accumulate logs', () => {
@@ -330,7 +330,7 @@ describe('ReaderT Combinations', () => {
                 .flatMap(x => RT.from((_: string) => Writer.of(x * 2, ' second')));
             const result = r.run('env');
             expect((result as any).value).toBe(10);
-            expect((result as any).log).toBe('first second');
+            expect((result as any).logs).toEqual(['first',' second']);
         });
     });
 });
@@ -434,10 +434,10 @@ describe('ResultT Combinations', () => {
         });
 
         it('should handle errors with environment', () => {
-            const r = RT.from(Reader.from((env: Env) => 
+            const r = RT.from(Reader.from((env: Env) =>
                 env.config.length > 0 ? Result.ok(env.config) : Result.err('empty')
             ));
-            
+
             expect(Result.isOk(r.run().run({ config: 'test' }))).toBe(true);
             expect(Result.isErr(r.run().run({ config: '' }))).toBe(true);
         });
@@ -449,7 +449,7 @@ describe('ResultT Combinations', () => {
         it('should combine Result and Writer semantics', () => {
             const r = RT.of(42);
             const result = r.run(); // Writer<Result<number, string>>
-            expect((result as any).log).toBe('');
+            expect((result as any).logs).toEqual([]);
             const innerResult = (result as any).value;
             expect(Result.isOk(innerResult)).toBe(true);
             expect((innerResult as any).value).toBe(42);
@@ -460,7 +460,7 @@ describe('ResultT Combinations', () => {
                 .flatMap(x => RT.lift(Writer.of(x * 2, ' middle')))
                 .flatMap(x => RT.lift(Writer.of(x + 1, ' end')));
             const result = r.run();
-            expect((result as any).log).toBe('start middle end');
+            expect((result as any).logs).toEqual(['start',' middle',' end']);
             const innerResult = (result as any).value;
             expect((innerResult as any).value).toBe(11);
         });
@@ -470,7 +470,7 @@ describe('ResultT Combinations', () => {
                 .flatMap(x => RT.from(Writer.of(Result.err<number, string>('error'), ' error')))
                 .flatMap(x => RT.lift(Writer.of(x + 1, ' end')));
             const result = r.run();
-            expect((result as any).log).toBe('start error');
+            expect((result as any).logs).toEqual(['start', ' error']);
             const innerResult = (result as any).value;
             expect(Result.isErr(innerResult)).toBe(true);
         });
@@ -744,7 +744,7 @@ describe('Triple-Nested Transformers', () => {
         });
 
         it('should compose all three effects', () => {
-            const m = MRT.from(RT_Reader.from((env: string) => 
+            const m = MRT.from(RT_Reader.from((env: string) =>
                 RT_Result.of(Maybe.some(env.length))
             )).flatMap(len => MRT.of(len * 2));
             const result = m.run().run('hello').run();
@@ -786,13 +786,13 @@ describe('Triple-Nested Transformers', () => {
         });
 
         it('should handle Result errors while preserving other effects', () => {
-            const w = WRT.from(RT_Result.from(RT_Reader.from((env: string) => 
+            const w = WRT.from(RT_Result.from(RT_Reader.from((env: string) =>
                 env.length > 0 ? Result.ok<[number, string], string>([env.length, 'log']) : Result.err('empty')
             )));
-            
+
             const successResult = w.run().run().run('hello');
             expect(Result.isOk(successResult)).toBe(true);
-            
+
             const errorResult = w.run().run().run('');
             expect(Result.isErr(errorResult)).toBe(true);
         });

@@ -6,19 +6,19 @@ describe('typeclass - Writer', () => {
         it('creates Writer with of', () => {
             const writer = Writer.of(42);
             expect(writer.value).toBe(42);
-            expect(writer.log).toBe('');
+            expect(writer.logs).toEqual([]);
         });
 
         it('creates Writer with value and log', () => {
             const writer = Writer.of(42, 'initial log;');
             expect(writer.value).toBe(42);
-            expect(writer.log).toBe('initial log;');
+            expect(writer.logs).toEqual(['initial log;']);
         });
 
         it('creates Writer with tell', () => {
             const writer = Writer.tell('log message');
             expect(writer.value).toBe(undefined);
-            expect(writer.log).toBe('log message');
+            expect(writer.logs).toEqual(['log message']);
         });
     });
 
@@ -27,21 +27,21 @@ describe('typeclass - Writer', () => {
             const writer = Writer.of(5, 'start;');
             const mapped = writer.map(x => x * 2);
             expect(mapped.value).toBe(10);
-            expect(mapped.log).toBe('start;');
+            expect(mapped.logs).toEqual(['start;']);
         });
 
         it('map preserves the log', () => {
             const writer = Writer.of(5, 'log1;');
             const mapped = writer.map(x => x + 3);
             expect(mapped.value).toBe(8);
-            expect(mapped.log).toBe('log1;');
+            expect(mapped.logs).toEqual(['log1;']);
         });
 
         it('map can change types', () => {
             const writer = Writer.of(42, 'log;');
             const mapped = writer.map(x => `Value: ${x}`);
             expect(mapped.value).toBe('Value: 42');
-            expect(mapped.log).toBe('log;');
+            expect(mapped.logs).toEqual(['log;']);
         });
 
         it('chained maps work correctly', () => {
@@ -50,14 +50,14 @@ describe('typeclass - Writer', () => {
                 .map(x => x * 2)
                 .map(x => `Result: ${x}`);
             expect(writer.value).toBe('Result: 6');
-            expect(writer.log).toBe('start;');
+            expect(writer.logs).toEqual(['start;']);
         });
 
         it('map with empty log', () => {
             const writer = Writer.of(10);
             const mapped = writer.map(x => x * 2);
             expect(mapped.value).toBe(20);
-            expect(mapped.log).toBe('');
+            expect(mapped.logs).toEqual([]);
         });
     });
 
@@ -66,7 +66,7 @@ describe('typeclass - Writer', () => {
             const writer = Writer.of(5, 'start;');
             const chained = writer.flatMap(x => Writer.of(x * 2, 'double;'));
             expect(chained.value).toBe(10);
-            expect(chained.log).toBe('start;double;');
+            expect(chained.logs).toEqual(['start;', 'double;']);
         });
 
         it('flatMap accumulates logs', () => {
@@ -74,14 +74,14 @@ describe('typeclass - Writer', () => {
                 .flatMap(x => Writer.of(x + 1, 'log2;'))
                 .flatMap(x => Writer.of(x * 2, 'log3;'));
             expect(writer.value).toBe(6);
-            expect(writer.log).toBe('log1;log2;log3;');
+            expect(writer.logs).toEqual(['log1;','log2;','log3;']);
         });
 
         it('flatMap with empty logs', () => {
             const writer = Writer.of(5)
                 .flatMap(x => Writer.of(x * 2));
             expect(writer.value).toBe(10);
-            expect(writer.log).toBe('');
+            expect(writer.logs).toEqual([]);
         });
 
         it('flatMap handles mixed empty and non-empty logs', () => {
@@ -89,14 +89,14 @@ describe('typeclass - Writer', () => {
                 .flatMap(x => Writer.of(x + 1))
                 .flatMap(x => Writer.of(x * 2, 'end;'));
             expect(writer.value).toBe(12);
-            expect(writer.log).toBe('start;end;');
+            expect(writer.logs).toEqual(['start;','end;']);
         });
 
         it('flatMap can use tell for logging', () => {
             const writer = Writer.of(5, 'start;')
                 .flatMap(x => Writer.tell('processing;').flatMap(() => Writer.of(x * 2, 'done;')));
             expect(writer.value).toBe(10);
-            expect(writer.log).toBe('start;processing;done;');
+            expect(writer.logs).toEqual(['start;','processing;','done;']);
         });
     });
 
@@ -104,7 +104,7 @@ describe('typeclass - Writer', () => {
         it('tell creates writer with log only', () => {
             const writer = Writer.tell('message');
             expect(writer.value).toBe(undefined);
-            expect(writer.log).toBe('message');
+            expect(writer.logs).toEqual(['message']);
         });
 
         it('tell can be chained with flatMap', () => {
@@ -112,14 +112,14 @@ describe('typeclass - Writer', () => {
                 .flatMap(() => Writer.tell('log2;'))
                 .flatMap(() => Writer.of(42, 'log3;'));
             expect(writer.value).toBe(42);
-            expect(writer.log).toBe('log1;log2;log3;');
+            expect(writer.logs).toEqual(['log1;','log2;','log3;']);
         });
 
         it('tell with map ignores the undefined value', () => {
             const writer = Writer.tell('log;')
                 .flatMap(() => Writer.of(10, 'value;'));
             expect(writer.value).toBe(10);
-            expect(writer.log).toBe('log;value;');
+            expect(writer.logs).toEqual(['log;','value;']);
         });
     });
 
@@ -131,7 +131,7 @@ describe('typeclass - Writer', () => {
                 .map(x => x + 5)
                 .flatMap(x => Writer.of(x, 'end;'));
             expect(writer.value).toBe(9);
-            expect(writer.log).toBe('start;double;end;');
+            expect(writer.logs).toEqual(['start;','double;','end;']);
         });
 
         it('accumulates with tell in pipeline', () => {
@@ -140,7 +140,7 @@ describe('typeclass - Writer', () => {
                 .flatMap(x => Writer.tell('step2;').flatMap(() => Writer.of(x * 2)))
                 .flatMap(x => Writer.of(x, 'final;'));
             expect(writer.value).toBe(12);
-            expect(writer.log).toBe('init;step1;step2;final;');
+            expect(writer.logs).toEqual(['init;','step1;','step2;','final;']);
         });
 
         it('handles complex logging patterns', () => {
@@ -153,7 +153,7 @@ describe('typeclass - Writer', () => {
                 .flatMap(x => Writer.of(x, 'end.'));
 
             expect(writer.value).toBe(30);
-            expect(writer.log).toBe('start; [add] result=15; [multiply] result=30; end.');
+            expect(writer.logs).toEqual(['start; ','[add] ','result=15; ','[multiply] ','result=30; ','end.']);
         });
     });
 
@@ -166,14 +166,14 @@ describe('typeclass - Writer', () => {
             const left = Writer.of(a).flatMap(f);
             const right = f(a);
             expect(left.value).toBe(right.value);
-            expect(left.log).toBe(right.log);
+            expect(left.logs).toEqual(right.logs);
         });
 
         it('satisfies right identity: m.flatMap(of) === m', () => {
             const m = Writer.of(5, 'log;');
             const left = m.flatMap(x => Writer.of(x));
             expect(left.value).toBe(m.value);
-            expect(left.log).toBe(m.log);
+            expect(left.logs).toEqual(m.logs);
         });
 
         it('satisfies associativity: m.flatMap(f).flatMap(g) === m.flatMap(x => f(x).flatMap(g))', () => {
@@ -181,7 +181,7 @@ describe('typeclass - Writer', () => {
             const left = m.flatMap(f).flatMap(g);
             const right = m.flatMap(x => f(x).flatMap(g));
             expect(left.value).toBe(right.value);
-            expect(left.log).toBe(right.log);
+            expect(left.logs).toEqual(right.logs);
         });
     });
 
@@ -190,7 +190,7 @@ describe('typeclass - Writer', () => {
             const m = Writer.of(5, 'log;');
             const mapped = m.map(x => x);
             expect(mapped.value).toBe(m.value);
-            expect(mapped.log).toBe(m.log);
+            expect(mapped.logs).toEqual(m.logs);
         });
 
         it('satisfies composition: m.map(f).map(g) === m.map(x => g(f(x)))', () => {
@@ -201,7 +201,7 @@ describe('typeclass - Writer', () => {
             const left = m.map(f).map(g);
             const right = m.map(x => g(f(x)));
             expect(left.value).toBe(right.value);
-            expect(left.log).toBe(right.log);
+            expect(left.logs).toEqual(right.logs);
         });
     });
 
@@ -209,11 +209,11 @@ describe('typeclass - Writer', () => {
         it('handles null and undefined values', () => {
             const writerNull = Writer.of(null, 'null;');
             expect(writerNull.value).toBe(null);
-            expect(writerNull.log).toBe('null;');
+            expect(writerNull.logs).toEqual(['null;']);
 
             const writerUndefined = Writer.of(undefined, 'undefined;');
             expect(writerUndefined.value).toBe(undefined);
-            expect(writerUndefined.log).toBe('undefined;');
+            expect(writerUndefined.logs).toEqual(['undefined;']);
         });
 
         it('handles complex objects', () => {
@@ -221,7 +221,7 @@ describe('typeclass - Writer', () => {
             const writer = Writer.of(obj, 'object;');
             const mapped = writer.map(o => o.b.c);
             expect(mapped.value).toBe(2);
-            expect(mapped.log).toBe('object;');
+            expect(mapped.logs).toEqual(['object;']);
         });
 
         it('handles arrays', () => {
@@ -229,7 +229,7 @@ describe('typeclass - Writer', () => {
             const writer = Writer.of(arr, 'array;');
             const mapped = writer.map(a => a.length);
             expect(mapped.value).toBe(3);
-            expect(mapped.log).toBe('array;');
+            expect(mapped.logs).toEqual(['array;']);
         });
 
         it('handles empty string logs', () => {
@@ -237,7 +237,7 @@ describe('typeclass - Writer', () => {
                 .flatMap(x => Writer.of(x * 2, ''))
                 .flatMap(x => Writer.of(x + 1, ''));
             expect(writer.value).toBe(85);
-            expect(writer.log).toBe('');
+            expect(writer.logs).toEqual([]);
         });
 
         it('handles very long log chains', () => {
@@ -246,7 +246,7 @@ describe('typeclass - Writer', () => {
                 writer = writer.flatMap(x => Writer.of(x + 1, `step${i};`));
             }
             expect(writer.value).toBe(10);
-            expect(writer.log).toBe('start;step0;step1;step2;step3;step4;step5;step6;step7;step8;step9;');
+            expect(writer.logs).toEqual(['start;','step0;','step1;','step2;','step3;','step4;','step5;','step6;','step7;','step8;','step9;']);
         });
 
         it('log concatenation is associative', () => {
@@ -258,8 +258,8 @@ describe('typeclass - Writer', () => {
             const right = w1.flatMap(() => w2.flatMap(() => w3));
 
             expect(left.value).toBe(right.value);
-            expect(left.log).toBe(right.log);
-            expect(left.log).toBe('a;b;c;');
+            expect(left.logs).toEqual(right.logs);
+            expect(left.logs).toEqual(['a;','b;','c;']);
         });
 
         it('works with computation-heavy pipelines', () => {
@@ -273,8 +273,8 @@ describe('typeclass - Writer', () => {
 
             const result = factorial(5);
             expect(result.value).toBe(120);
-            expect(result.log).toContain('step n=5;');
-            expect(result.log).toContain('factorial(1)=1;');
+            expect(result.logs).toContain('step n=5; ');
+            expect(result.logs).toContain('factorial(1)=1; ');
         });
     });
 });
