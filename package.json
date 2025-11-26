@@ -24,23 +24,18 @@
   "keywords": [
     "typescript",
     "functional-programming",
-    "monad",
-    "monad-transformer",
-    "maybe",
-    "result",
-    "either",
-    "reader",
-    "writer",
-    "lens",
-    "prism",
-    "optics",
-    "fp",
-    "functional",
-    "type-safe",
-    "utilities"
+    "fp"
   ],
   "author": "Phil Lui",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phillui-37/ts-toolbox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/phillui-37/ts-toolbox/issues"
+  },
+  "homepage": "https://github.com/phillui-37/ts-toolbox",
   "packageManager": "pnpm@10.23.0",
   "dependencies": {
     "ts-pattern": "^5.9.0"
