@@ -6,6 +6,10 @@ import { Lens, Maybe, Result, Prism, TaggedComponent, Reader, Writer, Monad, Tra
 export * from './typeclass/hkt.js';
 export * from './typeclass/transformer/index.js';
 export * from './util/fnUtil.js';
+export * from './util/boolean.js';
+export * from './util/collections.js';
+export * from './util/number.js';
+export * from './util/operator.js';
 
 export {
     // Namespaces
