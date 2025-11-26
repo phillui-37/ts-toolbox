@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-11-26
+
+### Added
+- Coverage badge showing 97% test coverage in README.md
+- Automated coverage badge update script (`scripts/update-coverage-badge.js`)
+- New npm script `test:coverage` for running tests with coverage and auto-updating badge
+
+### Changed
+- Improved test coverage from ~94% to 97%
+- Added tests for monad transformer fallback paths (when `map` is undefined)
+- Added tests for number utility boundary conditions
+- Upgraded vitest from v1.3.0 to v4.0.14
+- Added @vitest/coverage-v8 v4.0.14 for coverage reporting
+- Updated vite.config.js with test coverage configuration
+
+### Fixed
+- Writer monad implementation improvements
+- Unit test corrections and enhancements
+
 ## [1.0.0] - 2025-11-25
 
 ### Added

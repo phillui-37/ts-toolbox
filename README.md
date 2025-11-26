@@ -13,6 +13,7 @@
   <a href="https://bundlephobia.com/package/@phillui/ts-toolbox">
     <img src="https://img.shields.io/bundlephobia/minzip/@phillui/ts-toolbox" alt="bundle size" />
   </a>
+  <img src="https://img.shields.io/badge/coverage-97%25-brightgreen" alt="coverage" />
   <img src="https://img.shields.io/badge/types-Included-blue" alt="types included" />
   <img src="https://img.shields.io/badge/tree--shakeable-yes-success" alt="tree-shakeable" />
 </p>

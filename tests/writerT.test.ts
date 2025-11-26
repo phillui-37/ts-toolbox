@@ -38,6 +38,13 @@ describe('typeclass - WriterT', () => {
         map: <A, B>(m: Result<A, string>, f: (a: A) => B): Result<B, string> => m.map(f),
     };
 
+    // Monad without map (to test fallback path)
+    const monadWithoutMap: Required<MonadTransDescriptor<any>> = {
+        of: <A>(a: A) => a,
+        flatMap: <A, B>(m: A, f: (a: A) => B) => f(m),
+        map: undefined as any,
+    };
+
     describe('Constructors', () => {
         it('of creates WriterT with value and empty log', () => {
             const WT = WriterT(identityMonad, stringMonoid);
@@ -443,6 +450,24 @@ describe('typeclass - WriterT', () => {
             expect(result[0]).toBe(120);
             expect(result[1]).toContain('computing factorial(5)');
             expect(result[1]).toContain('factorial(1)=1');
+        });
+    });
+
+    describe('Fallback paths (monad without map)', () => {
+        it('map uses flatMap fallback when map is undefined', () => {
+            const WT = WriterT(monadWithoutMap, stringMonoid);
+            const wt = WT.of(42);
+            const result = wt.map(x => x * 2).run();
+            expect(result[0]).toBe(84);
+            expect(result[1]).toBe('');
+        });
+
+        it('lift uses flatMap fallback when map is undefined', () => {
+            const WT = WriterT(monadWithoutMap, stringMonoid);
+            const wt = WT.lift(100);
+            const result = wt.run();
+            expect(result[0]).toBe(100);
+            expect(result[1]).toBe('');
         });
     });
 });

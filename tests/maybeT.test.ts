@@ -26,6 +26,13 @@ describe('typeclass - MaybeT', () => {
         map: <A, B>(m: Result<A, string>, f: (a: A) => B): Result<B, string> => m.map(f),
     };
 
+    // Monad without map (to test fallback path)
+    const monadWithoutMap: Required<MonadTransDescriptor<any>> = {
+        of: <A>(a: A) => a,
+        flatMap: <A, B>(m: A, f: (a: A) => B) => f(m),
+        map: undefined as any,
+    };
+
     describe('Constructors', () => {
         it('of creates MaybeT with Some value', () => {
             const MT = MaybeT(identityMonad);
@@ -380,6 +387,31 @@ describe('typeclass - MaybeT', () => {
                 .map(x => x + 5)
                 .run();
             expect(Maybe.isNone(result2)).toBe(true);
+        });
+    });
+
+    describe('Fallback paths (monad without map)', () => {
+        it('map uses flatMap fallback when map is undefined', () => {
+            const MT = MaybeT(monadWithoutMap);
+            const mt = MT.of(42);
+            const result = mt.map(x => x * 2).run();
+            expect(Maybe.isSome(result)).toBe(true);
+            expect(result.value).toBe(84);
+        });
+
+        it('lift uses flatMap fallback when map is undefined', () => {
+            const MT = MaybeT(monadWithoutMap);
+            const mt = MT.lift(100);
+            const result = mt.run();
+            expect(Maybe.isSome(result)).toBe(true);
+            expect(result.value).toBe(100);
+        });
+
+        it('map fallback with None propagates None', () => {
+            const MT = MaybeT(monadWithoutMap);
+            const mt = MT.from(Maybe.none<number>());
+            const result = mt.map(x => x * 2).run();
+            expect(Maybe.isNone(result)).toBe(true);
         });
     });
 });

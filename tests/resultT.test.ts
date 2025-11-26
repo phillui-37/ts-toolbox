@@ -26,6 +26,13 @@ describe('typeclass - ResultT', () => {
         map: <A, B>(m: Result<A, string>, f: (a: A) => B): Result<B, string> => m.map(f),
     };
 
+    // Monad without map (to test fallback path)
+    const monadWithoutMap: Required<MonadTransDescriptor<any>> = {
+        of: <A>(a: A) => a,
+        flatMap: <A, B>(m: A, f: (a: A) => B) => f(m),
+        map: undefined as any,
+    };
+
     describe('Constructors', () => {
         it('of creates ResultT with Ok value', () => {
             const RT = ResultT<any, string>(identityMonad);
@@ -452,6 +459,32 @@ describe('typeclass - ResultT', () => {
                 .run();
             
             expect(result.value).toBe(12); // [2, 4] -> [4, 8] -> 12
+        });
+    });
+
+    describe('Fallback paths (monad without map)', () => {
+        it('map uses flatMap fallback when map is undefined', () => {
+            const RT = ResultT<any, string>(monadWithoutMap);
+            const rt = RT.of(42);
+            const result = rt.map(x => x * 2).run();
+            expect(Result.isOk(result)).toBe(true);
+            expect(result.value).toBe(84);
+        });
+
+        it('lift uses flatMap fallback when map is undefined', () => {
+            const RT = ResultT<any, string>(monadWithoutMap);
+            const rt = RT.lift(100);
+            const result = rt.run();
+            expect(Result.isOk(result)).toBe(true);
+            expect(result.value).toBe(100);
+        });
+
+        it('map fallback with Err propagates error', () => {
+            const RT = ResultT<any, string>(monadWithoutMap);
+            const rt = RT.from(Result.err<number, string>('error'));
+            const result = rt.map(x => x * 2).run();
+            expect(Result.isErr(result)).toBe(true);
+            expect(result.error).toBe('error');
         });
     });
 });
